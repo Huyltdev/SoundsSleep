@@ -8,13 +8,15 @@ import android.provider.MediaStore.Video.Media
 import android.view.Window
 import android.view.WindowManager
 import android.widget.AdapterView
+import android.widget.Button
+import android.widget.TextView
 import android.widget.Toast
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.example.babysleepsounds.databinding.ActivityMainBinding
 
 private lateinit var binding: ActivityMainBinding
 
-class MainActivity : AppCompatActivity(){
+class MainActivity : AppCompatActivity() {
     private var mediaPlayer: MediaPlayer? = null
     private var lastClickedPosition: Int? = null
 
@@ -28,6 +30,8 @@ class MainActivity : AppCompatActivity(){
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         //Code
+        //
+
 
         //Declare list
         var list = mutableListOf<OutData>()
@@ -69,11 +73,12 @@ class MainActivity : AppCompatActivity(){
         binding.gvSounds1.adapter = customGV
 
         //Fragment
-        val sub = Fragment1()
-        supportFragmentManager.beginTransaction().apply {
-            replace(R.id.fl, sub)
-            commit()
-        }
+//        val sub = Fragment1()
+//        supportFragmentManager.beginTransaction().apply {
+//            replace(R.id.fl, sub)
+//            commit()
+//        }
+
         //Click item
         binding.gvSounds1.onItemClickListener =
             AdapterView.OnItemClickListener { adapterView, view, i, l ->
@@ -97,22 +102,34 @@ class MainActivity : AppCompatActivity(){
                     }
 
                     // Start playing the new sound
-                    mediaPlayer = MediaPlayer.create(this, list[i].linkSound)
-                    mediaPlayer?.start()
+                    try {
+                        mediaPlayer = MediaPlayer.create(this, list[i].linkSound)
+                        mediaPlayer?.start()
 
-                    // Release the MediaPlayer when it's completed
-                    mediaPlayer?.setOnCompletionListener {
-                        it.release()
+                        //
+                        val duration = mediaPlayer?.duration.toString()
+                        val fragment = Fragment1.newInstance(duration)
+                        supportFragmentManager.beginTransaction().apply {
+                            replace(R.id.fl, fragment)
+                            commitAllowingStateLoss()
+                        }
+                        // Release the MediaPlayer when it's completed
+                        mediaPlayer?.setOnCompletionListener {
+                            it.release()
+                        }
+
+                        // BGScreen change click item
+                        binding.root.setBackgroundResource(list[i].bg)
+
+                        // Update the last clicked position
+                        lastClickedPosition = i
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        // Handle the exception (show a toast or log the error)
+                        Toast.makeText(this, "Error playing the sound", Toast.LENGTH_SHORT).show()
                     }
-
-                    // BGScreen change click item
-                    binding.root.setBackgroundResource(list[i].bg)
-
-                    // Update the last clicked position
-                    lastClickedPosition = i
                 }
             }
-
     }
 
     override fun onDestroy() {
@@ -120,7 +137,6 @@ class MainActivity : AppCompatActivity(){
         mediaPlayer?.release()
         super.onDestroy()
     }
-
 
 
 }
