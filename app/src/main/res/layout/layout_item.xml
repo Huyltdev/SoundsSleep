@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="85dp"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:layout_height="120dp">
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="80dp"
+        app:cardCornerRadius="3dp"
+        app:cardBackgroundColor="#1AFAF8F8"
+        android:layout_height="80dp" >
+
+        <ImageView
+            android:id="@+id/imgSound"
+            android:layout_width="35dp"
+            android:layout_gravity="center"
+            android:layout_height="35dp"
+            app:srcCompat="@drawable/rainy" />
+    </androidx.cardview.widget.CardView>
+
+    <TextView
+        android:id="@+id/txtSound"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:text="Name Sound"
+        android:textColor="@color/white"
+        android:textSize="13dp" />
+</LinearLayout>
