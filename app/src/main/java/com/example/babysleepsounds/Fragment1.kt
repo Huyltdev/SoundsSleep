@@ -17,28 +17,17 @@ interface OnPlayButtonClickListener {
 }
 
 class Fragment1 : Fragment(R.layout.fragment_1) {
-
     private lateinit var myTextView: TextView
     private lateinit var playButton: ImageButton
     private var isPlaying: Boolean = false
 
     companion object {
         private const val ARG_DURATION = "duration"
-        private const val ARG_IS_PLAYING = "isPlaying"
-        private var argumentsBtn: Bundle? = null
 
         fun newInstance(duration: String): Fragment1 {
             return Fragment1().apply {
                 arguments = Bundle().apply {
                     putString(ARG_DURATION, duration)
-                }
-            }
-        }
-
-        fun newInstanceBtn( isPlaying: Boolean): Fragment1 {
-            return Fragment1().apply {
-                argumentsBtn = Bundle().apply {
-                    putBoolean(ARG_IS_PLAYING, isPlaying)
                 }
             }
         }
@@ -49,15 +38,11 @@ class Fragment1 : Fragment(R.layout.fragment_1) {
         myTextView = view.findViewById(R.id.txtTimer)
         playButton = view.findViewById(R.id.btnPlay)
 
-        arguments?.getString(ARG_DURATION)?.toLongOrNull()?.let { durationInMillis ->
-            val totalSeconds = durationInMillis / 1000
-            val hours = totalSeconds / 3600
-            val minutes = (totalSeconds % 3600) / 60
-            val formattedTime = String.format("%02d:%02d", hours, minutes)
-            myTextView.text = formattedTime
+        arguments?.getString(ARG_DURATION)?.let { duration ->
+            updateDuration(duration)
         }
 
-        isPlaying = argumentsBtn?.getBoolean(ARG_IS_PLAYING) ?: false
+        isPlaying = savedInstanceState?.getBoolean(ARG_IS_PLAYING) ?: false
         updatePlayButtonImage()
 
         playButton.setOnClickListener {
@@ -72,11 +57,26 @@ class Fragment1 : Fragment(R.layout.fragment_1) {
         return view
     }
 
+    fun updateDuration(duration: String) {
+        myTextView.text = duration
+    }
+
+    fun updateIsPlaying(isPlaying: Boolean) {
+        this.isPlaying = isPlaying
+        updatePlayButtonImage()
+    }
+
     private fun updatePlayButtonImage() {
         if (isPlaying) {
             playButton.setImageResource(R.drawable.iconstop)
         } else {
             playButton.setImageResource(R.drawable.iconplay)
         }
+    }
+
+    // Save the isPlaying state
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putBoolean(ARG_IS_PLAYING, isPlaying)
     }
 }

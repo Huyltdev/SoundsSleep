@@ -17,6 +17,8 @@ class MainActivity : AppCompatActivity() {
     private var mediaPlayer: MediaPlayer? = null
     private var lastClickedPosition: Int? = null
     private var isPlaying: Boolean = false
+    private var durationFragmentAdded: Boolean = false
+    private var currentDurationFragment: Fragment1? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,95 +72,58 @@ class MainActivity : AppCompatActivity() {
         val customGV = CustomGridView(this, list)
         binding.gvSounds1.adapter = customGV
 
-        //Fragment
-//        val sub = Fragment1()
-//        supportFragmentManager.beginTransaction().apply {
-//            replace(R.id.fl, sub)
-//            commit()
-//        }
-
         //Click item
-        binding.gvSounds1.onItemClickListener =
-            AdapterView.OnItemClickListener { adapterView, view, i, l ->
-                if (lastClickedPosition == i) {
-                    mediaPlayer?.let {
-                        if (it.isPlaying) {
-                            it.pause()
-                            isPlaying = false
-                            val fragment1 = Fragment1.newInstanceBtn(isPlaying)
-                            supportFragmentManager.beginTransaction().apply {
-                                replace(R.id.fl, fragment1)
-                                commitAllowingStateLoss()
-                            }
-                        } else {
-                            it.start()
-                            isPlaying = true
-                            val fragment1 = Fragment1.newInstanceBtn(isPlaying)
-                            supportFragmentManager.beginTransaction().apply {
-                                replace(R.id.fl, fragment1)
-                                commitAllowingStateLoss()
-                            }
-                        }
+        binding.gvSounds1.onItemClickListener = AdapterView.OnItemClickListener { _, _, i, _ ->
+            playSound(list, i)
+        }
+    }
+
+    private fun playSound(list: MutableList<OutData>, position: Int) {
+        if (lastClickedPosition == position && mediaPlayer?.isPlaying == true) {
+            mediaPlayer?.pause()
+            isPlaying = false
+        } else {
+            mediaPlayer?.release()
+            mediaPlayer = MediaPlayer.create(this, list[position].linkSound).also { mp ->
+                mp.start()
+                isPlaying = true
+
+                // Đảm bảo rằng mediaPlayer đã sẵn sàng trước khi truy cập duration
+                val duration = mp.duration // Lấy duration của media player (là số milliseconds)
+                val durationSeconds = duration / 1000 // Chuyển đổi sang giây
+                val minutes = durationSeconds / 60
+                val seconds = durationSeconds % 60
+                val formattedDuration = String.format("%02d:%02d", minutes, seconds)
+
+                if (!durationFragmentAdded) {
+                    currentDurationFragment = Fragment1.newInstance(formattedDuration)
+                    supportFragmentManager.beginTransaction().apply {
+                        replace(R.id.fl, currentDurationFragment!!)
+                        commit()
                     }
+                    durationFragmentAdded = true
                 } else {
-                    mediaPlayer?.let {
-                        if (it.isPlaying) {
-                            it.stop()
-                            it.release()
-                            isPlaying = false
-                            val fragment1 = Fragment1.newInstanceBtn(isPlaying)
-                            supportFragmentManager.beginTransaction().apply {
-                                replace(R.id.fl, fragment1)
-                                commitAllowingStateLoss()
-                            }
-                        }
-                    }
+                    currentDurationFragment?.updateDuration(formattedDuration)
+                }
 
-                    try {
-                        mediaPlayer = MediaPlayer.create(this, list[i].linkSound)
-                        mediaPlayer?.start()
-                        isPlaying = true
-
-                        val duration = mediaPlayer?.duration.toString()
-                        val fragment = Fragment1.newInstance(duration)
-                        supportFragmentManager.beginTransaction().apply {
-                            replace(R.id.fl, fragment)
-                            commitAllowingStateLoss()
-                        }
-                        val fragment1 = Fragment1.newInstanceBtn(isPlaying)
-                        supportFragmentManager.beginTransaction().apply {
-                            replace(R.id.fl, fragment1)
-                            commitAllowingStateLoss()
-                        }
-
-                        mediaPlayer?.setOnCompletionListener {
-                            it.release()
-                            isPlaying = false
-                            val fragment1 = Fragment1.newInstanceBtn(isPlaying)
-                            supportFragmentManager.beginTransaction().apply {
-                                replace(R.id.fl, fragment1)
-                                commitAllowingStateLoss()
-                            }
-                        }
-
-                        binding.root.setBackgroundResource(list[i].bg)
-                        lastClickedPosition = i
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                        Toast.makeText(this, "Error playing the sound", Toast.LENGTH_SHORT).show()
-                    }
+                mp.setOnCompletionListener {
+                    it.release()
+                    isPlaying = false
+                    // You might want to update the UI or fragment state here
                 }
             }
+            lastClickedPosition = position
+            binding.root.setBackgroundResource(list[position].bg)
+        }
+        updateFragment(isPlaying)
+    }
 
-
+    private fun updateFragment(isPlaying: Boolean) {
+        // Your code to update the fragment, for example, to change play/pause button state
     }
 
     override fun onDestroy() {
-        // Release any resources here
         mediaPlayer?.release()
         super.onDestroy()
     }
-
-
-
 }
