@@ -20,7 +20,7 @@ class Fragment1 : Fragment() {
     private lateinit var currentTimeView: TextView
     private lateinit var volumeSeekBar: SeekBar
     private lateinit var audioManager: AudioManager
-
+    private lateinit var btnMute: ImageButton
     // Đối tượng companion object, giúp tạo ra Fragment1 với đối số duration
     companion object {
         private const val ARG_DURATION = "duration"
@@ -48,6 +48,7 @@ class Fragment1 : Fragment() {
         playButton = view.findViewById(R.id.btnPlay)
         currentTimeView = view.findViewById(R.id.txtCurrentTime)
         volumeSeekBar = view.findViewById(R.id.volumeSeekBar)
+        btnMute = view.findViewById(R.id.btnMute)
 
         // Lấy đối số duration từ Bundle và cập nhật TextView
         arguments?.getString(ARG_DURATION)?.let {
@@ -69,8 +70,28 @@ class Fragment1 : Fragment() {
             setupVolumeControl()
         }
 
+        // Thiết lập sự kiện nghe cho btnMute để xử lý khi nút được nhấn
+        btnMute.setOnClickListener {
+            onMuteButtonClicked(it)
+        }
+
         // Trả về view đã được tạo để hiển thị trên giao diện người dùng
         return view
+    }
+
+    private fun onMuteButtonClicked(view: View) {
+        // Lấy trạng thái âm lượng hiện tại
+        val maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
+        val currentVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
+
+        // Nếu âm lượng hiện tại là 0, thì chuyển về âm lượng tối đa; ngược lại, chuyển về 0
+        val newVolume = if (currentVolume == 0) maxVolume else 0
+
+        // Cập nhật âm lượng
+        audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, newVolume, 0)
+
+        // Cập nhật trạng thái của SeekBar nếu cần
+        volumeSeekBar.progress = newVolume
     }
 
     private fun setupVolumeControl() {
