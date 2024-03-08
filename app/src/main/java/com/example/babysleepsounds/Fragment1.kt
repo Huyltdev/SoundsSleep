@@ -1,13 +1,15 @@
 package com.example.babysleepsounds
 
+import android.content.Context
+import android.media.AudioManager
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
+import android.widget.SeekBar
 import android.widget.TextView
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 
 class Fragment1 : Fragment() {
@@ -16,6 +18,8 @@ class Fragment1 : Fragment() {
     private lateinit var playButton: ImageButton
     private var isPlaying: Boolean = false
     private lateinit var currentTimeView: TextView
+    private lateinit var volumeSeekBar: SeekBar
+    private lateinit var audioManager: AudioManager
 
     // Đối tượng companion object, giúp tạo ra Fragment1 với đối số duration
     companion object {
@@ -43,6 +47,7 @@ class Fragment1 : Fragment() {
         myTextView = view.findViewById(R.id.txtTimer)
         playButton = view.findViewById(R.id.btnPlay)
         currentTimeView = view.findViewById(R.id.txtCurrentTime)
+        volumeSeekBar = view.findViewById(R.id.volumeSeekBar)
 
         // Lấy đối số duration từ Bundle và cập nhật TextView
         arguments?.getString(ARG_DURATION)?.let {
@@ -58,8 +63,35 @@ class Fragment1 : Fragment() {
             onPlayButtonClicked(it)
         }
 
+        // Thiết lập AudioManager và Volume Control
+        activity?.let {
+            audioManager = it.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+            setupVolumeControl()
+        }
+
         // Trả về view đã được tạo để hiển thị trên giao diện người dùng
         return view
+    }
+
+    private fun setupVolumeControl() {
+        val maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
+        val currentVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
+        volumeSeekBar.max = maxVolume
+        volumeSeekBar.progress = currentVolume
+
+        volumeSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, progress, 0)
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+                // Có thể thêm code xử lý khi bắt đầu kéo SeekBar nếu cần
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+                // Có thể thêm code xử lý khi dừng kéo SeekBar nếu cần
+            }
+        })
     }
 
     fun updateCurrentTime(time: String) {

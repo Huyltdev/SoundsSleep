@@ -1,56 +1,95 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg_customfl"
-    android:orientation="horizontal"
     android:layout_gravity="center"
+    android:background="@drawable/bg_customfl"
     android:gravity="center"
+    android:orientation="vertical"
     tools:context=".Fragment1">
 
-    <!-- TextView hiển thị thời gian -->
-    <TextView
-        android:id="@+id/txtCurrentTime"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:text="00:00:00"
-        android:textColor="@color/black"
-        android:textStyle="bold" />
-
-    <!-- Button Play -->
-    <ImageButton
-        android:id="@+id/btnPlay"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:background="@color/white"
-        android:onClick="onPlayButtonClicked"
-        android:src="@drawable/iconplay" />
-
-    <!-- ImageButton và TextView cho Timer -->
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:orientation="vertical">
-
-        <ImageButton
-            android:id="@+id/btnTimer"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:background="@color/white"
-            android:src="@drawable/ic_baseline_more_time_24" />
+        android:orientation="horizontal">
+        <!-- TextView hiển thị thời gian -->
 
         <TextView
-            android:id="@+id/txtTimer"
+            android:id="@+id/txtCurrentTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:text="00:00:00"
+            android:textSize="17dp"
+            android:textColor="@color/teal_200"
+            android:textStyle="bold" />
+
+        <!-- Button Play -->
+        <ImageButton
+            android:id="@+id/btnPlay"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginLeft="40dp"
+            android:layout_marginRight="50dp"
+            android:background="@color/white"
+            android:onClick="onPlayButtonClicked"
+            android:src="@drawable/iconplay" />
+
+        <!-- ImageButton và TextView cho Timer -->
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="00:00"
-            android:textColor="@color/black"
-            android:textStyle="bold" />
+            android:orientation="vertical">
+
+            <ImageButton
+                android:id="@+id/btnTimer"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:background="@color/white"
+                android:src="@drawable/ic_more_time" />
+
+            <TextView
+                android:id="@+id/txtTimer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="00:00"
+                android:textSize="17dp"
+                android:textColor="@color/teal_200"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_marginTop="30dp"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/btnVoic"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:background="@color/white"
+            android:src="@drawable/ic_volume_up" />
+
+    <SeekBar
+        android:id="@+id/volumeSeekBar"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:max="100"
+        android:progress="0" />
+
+        <ImageButton
+            android:id="@+id/btnClose"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:background="@color/white"
+            android:src="@drawable/ic_close" />
     </LinearLayout>
 </LinearLayout>
