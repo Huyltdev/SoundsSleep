@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 
 class Fragment1 : Fragment() {
@@ -14,6 +15,7 @@ class Fragment1 : Fragment() {
     private lateinit var myTextView: TextView
     private lateinit var playButton: ImageButton
     private var isPlaying: Boolean = false
+    private lateinit var currentTimeView: TextView
 
     // Đối tượng companion object, giúp tạo ra Fragment1 với đối số duration
     companion object {
@@ -40,6 +42,7 @@ class Fragment1 : Fragment() {
         // Liên kết biến với các phần tử trong layout
         myTextView = view.findViewById(R.id.txtTimer)
         playButton = view.findViewById(R.id.btnPlay)
+        currentTimeView = view.findViewById(R.id.txtCurrentTime)
 
         // Lấy đối số duration từ Bundle và cập nhật TextView
         arguments?.getString(ARG_DURATION)?.let {
@@ -58,6 +61,11 @@ class Fragment1 : Fragment() {
         // Trả về view đã được tạo để hiển thị trên giao diện người dùng
         return view
     }
+
+    fun updateCurrentTime(time: String) {
+        currentTimeView.text = time
+    }
+
 
     // Hàm này cập nhật TextView với giá trị duration mới
     fun updateDuration(duration: String) {

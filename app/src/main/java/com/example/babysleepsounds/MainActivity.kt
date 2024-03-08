@@ -3,6 +3,8 @@ package com.example.babysleepsounds
 import android.media.MediaPlayer
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.widget.*
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.example.babysleepsounds.databinding.ActivityMainBinding
@@ -14,6 +16,8 @@ class MainActivity : AppCompatActivity(), Fragment1.OnPlayButtonClickListener {
     private var currentDurationFragment: Fragment1? = null
     private var lastClickedPosition: Int? = null
     private var durationFragmentAdded: Boolean = false
+    private val handler = Handler(Looper.getMainLooper())
+    private lateinit var runnable: Runnable
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -87,7 +91,7 @@ class MainActivity : AppCompatActivity(), Fragment1.OnPlayButtonClickListener {
             // Tạo mới MediaPlayer và bắt đầu phát âm thanh
             mediaPlayer = MediaPlayer.create(this, list[position].linkSound)
             mediaPlayer?.start()
-
+            updateCurrentTimeEverySecond()
             // Cập nhật trạng thái isPlaying
             mediaPlayer?.let {
                 isPlaying = true
@@ -104,9 +108,11 @@ class MainActivity : AppCompatActivity(), Fragment1.OnPlayButtonClickListener {
                         commit()
                     }
                     durationFragmentAdded = true
+
                 } else {
                     currentDurationFragment?.updateDuration(durationFormatted)
                 }
+
 
                 // Thiết lập sự kiện khi âm thanh phát hết
                 it.setOnCompletionListener { mediaPlayer ->
@@ -128,6 +134,28 @@ class MainActivity : AppCompatActivity(), Fragment1.OnPlayButtonClickListener {
         currentDurationFragment?.updateIsPlaying(isPlaying)
     }
 
+    private fun updateCurrentTimeEverySecond() {
+        runnable = Runnable {
+            mediaPlayer?.let {
+                if (it.isPlaying) {
+                    val currentTime = it.currentPosition
+                    val currentTimeFormatted = formatcurrentTime(currentTime)
+                    currentDurationFragment?.updateCurrentTime(currentTimeFormatted)
+                }
+                handler.postDelayed(runnable, 1000)
+            }
+        }
+        handler.postDelayed(runnable, 1000)
+    }
+
+
+    private fun formatcurrentTime(durationMs: Int): String {
+        // Định dạng thời lượng thành chuỗi hh:mm
+        val hours = (durationMs / (1000 * 60 * 60)) % 24
+        val minutes = (durationMs / (1000 * 60)) % 60
+        val seconds = (durationMs / 1000) % 60
+        return String.format("%02d:%02d:%02d", hours, minutes, seconds)
+    }
     private fun formatDuration(durationMs: Int): String {
         // Định dạng thời lượng thành chuỗi hh:mm
         val hours = (durationMs / (1000 * 60 * 60)) % 24
@@ -150,6 +178,7 @@ class MainActivity : AppCompatActivity(), Fragment1.OnPlayButtonClickListener {
 
     override fun onDestroy() {
         // Giải phóng MediaPlayer khi Activity bị hủy
+        handler.removeCallbacks(runnable)
         mediaPlayer?.release()
         super.onDestroy()
     }

@@ -1,57 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/bg_customfl"
-    android:orientation="vertical"
+    android:orientation="horizontal"
+    android:layout_gravity="center"
+    android:gravity="center"
     tools:context=".Fragment1">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="10dp"
-        android:gravity="center_horizontal"
-        android:orientation="horizontal">
+    <!-- TextView hiển thị thời gian -->
+    <TextView
+        android:id="@+id/txtCurrentTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:text="00:00:00"
+        android:textColor="@color/black"
+        android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/txt1"
-            android:layout_width="100dp"
-            android:layout_height="30dp"
-            android:gravity="center" />
+    <!-- Button Play -->
+    <ImageButton
+        android:id="@+id/btnPlay"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:background="@color/white"
+        android:onClick="onPlayButtonClicked"
+        android:src="@drawable/iconplay" />
+
+    <!-- ImageButton và TextView cho Timer -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical">
 
         <ImageButton
-            android:id="@+id/btnPlay"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
+            android:id="@+id/btnTimer"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:background="@color/white"
-            android:onClick="onPlayButtonClicked"
-            android:src="@drawable/iconplay" />
+            android:src="@drawable/ic_baseline_more_time_24" />
 
-        <LinearLayout
-            android:layout_width="100dp"
-            android:layout_height="100dp"
+        <TextView
+            android:id="@+id/txtTimer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:gravity="center"
-            android:orientation="vertical">
-
-            <ImageButton
-                android:id="@+id/btnTimer"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:background="@color/white"
-                android:src="@drawable/ic_baseline_more_time_24" />
-
-            <TextView
-                android:id="@+id/txtTimer"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:gravity="center"
-                android:text="00:00"
-                android:textColor="@color/black"
-                android:textStyle="bold" />
-
-        </LinearLayout>
+            android:text="00:00"
+            android:textColor="@color/black"
+            android:textStyle="bold" />
     </LinearLayout>
 </LinearLayout>
