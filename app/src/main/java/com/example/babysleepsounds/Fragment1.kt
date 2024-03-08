@@ -2,25 +2,20 @@ package com.example.babysleepsounds
 
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
+import androidx.fragment.app.Fragment
 
-private const val ARG_DURATION = "duration"
-private const val ARG_IS_PLAYING = "isPlaying"
+class Fragment1 : Fragment() {
 
-interface OnPlayButtonClickListener {
-    fun onPlayButtonClicked(isPlaying: Boolean)
-}
-
-class Fragment1 : Fragment(R.layout.fragment_1) {
     private lateinit var myTextView: TextView
     private lateinit var playButton: ImageButton
     private var isPlaying: Boolean = false
 
+    // Đối tượng companion object, giúp tạo ra Fragment1 với đối số duration
     companion object {
         private const val ARG_DURATION = "duration"
 
@@ -33,50 +28,84 @@ class Fragment1 : Fragment(R.layout.fragment_1) {
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    // Ghi đè hàm onCreateView để khởi tạo giao diện người dùng
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        // Tạo ra view bằng cách inflate layout từ file XML (R.layout.fragment_1)
         val view: View = inflater.inflate(R.layout.fragment_1, container, false)
+
+        // Liên kết biến với các phần tử trong layout
         myTextView = view.findViewById(R.id.txtTimer)
         playButton = view.findViewById(R.id.btnPlay)
 
-        arguments?.getString(ARG_DURATION)?.let { duration ->
-            updateDuration(duration)
+        // Lấy đối số duration từ Bundle và cập nhật TextView
+        arguments?.getString(ARG_DURATION)?.let {
+            updateDuration(it)
         }
 
-        isPlaying = savedInstanceState?.getBoolean(ARG_IS_PLAYING) ?: false
+        // Khởi tạo trạng thái isPlaying là true và cập nhật hình ảnh của nút playButton
+        isPlaying = true // Khởi tạo với trạng thái đúng
         updatePlayButtonImage()
 
+        // Thiết lập sự kiện nghe cho nút playButton để xử lý khi nút được nhấn
         playButton.setOnClickListener {
-            // Toggle isPlaying and update the button image
-            isPlaying = !isPlaying
-            updatePlayButtonImage()
-
-            // Notify the MainActivity about the play button click event
-            (activity as? OnPlayButtonClickListener)?.onPlayButtonClicked(isPlaying)
+            onPlayButtonClicked(it)
         }
 
+        // Trả về view đã được tạo để hiển thị trên giao diện người dùng
         return view
     }
 
+    // Hàm này cập nhật TextView với giá trị duration mới
     fun updateDuration(duration: String) {
         myTextView.text = duration
     }
 
+    // Hàm này cập nhật trạng thái isPlaying và hình ảnh của nút playButton
     fun updateIsPlaying(isPlaying: Boolean) {
         this.isPlaying = isPlaying
         updatePlayButtonImage()
     }
 
-    private fun updatePlayButtonImage() {
-        if (isPlaying) {
-            playButton.setImageResource(R.drawable.iconstop)
-        } else {
-            playButton.setImageResource(R.drawable.iconplay)
+    // Hàm xử lý khi nút playButton được nhấn
+    fun onPlayButtonClicked(view: View) {
+        // Đảo ngược trạng thái isPlaying và cập nhật hình ảnh của nút playButton
+        isPlaying = !isPlaying
+        updatePlayButtonImage()
+
+        // Gọi sự kiện của interface để thông báo trạng thái mới
+        (activity as? OnPlayButtonClickListener)?.onPlayButtonClicked(isPlaying)
+
+        // Bắt các ngoại lệ có thể xảy ra trong quá trình gọi sự kiện
+        try {
+            (requireActivity() as OnPlayButtonClickListener).onPlayButtonClicked(isPlaying)
+        } catch (e: Exception) {
+            // Ghi log hoặc xử lý ngoại lệ phù hợp với ứng dụng của bạn
+            Log.e("Fragment11", "Lỗi trong onPlayButtonClicked", e)
         }
     }
 
-    // Save the isPlaying state
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putBoolean(ARG_IS_PLAYING, isPlaying)
+    // Hàm này cập nhật hình ảnh của nút playButton dựa trên trạng thái isPlaying
+    private fun updatePlayButtonImage() {
+        // Kiểm tra xem playButton đã được khởi tạo chưa
+        if (::playButton.isInitialized) {
+            // Nếu đã khởi tạo, cập nhật hình ảnh dựa trên trạng thái isPlaying
+            if (isPlaying) {
+                playButton.setImageResource(R.drawable.iconstop)
+            } else {
+                playButton.setImageResource(R.drawable.iconplay)
+            }
+        } else {
+            // Nếu chưa khởi tạo, ghi log lỗi
+            Log.e("Fragment22", "playButton is null in updatePlayButtonImage()")
+        }
+    }
+
+    // Interface để gửi sự kiện khi nút playButton được nhấn
+    interface OnPlayButtonClickListener {
+        fun onPlayButtonClicked(isPlaying: Boolean)
     }
 }
