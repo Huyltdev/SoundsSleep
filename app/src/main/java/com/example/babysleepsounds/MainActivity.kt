@@ -7,10 +7,7 @@ import android.os.Bundle
 import android.provider.MediaStore.Video.Media
 import android.view.Window
 import android.view.WindowManager
-import android.widget.AdapterView
-import android.widget.Button
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.example.babysleepsounds.databinding.ActivityMainBinding
 
@@ -19,6 +16,7 @@ private lateinit var binding: ActivityMainBinding
 class MainActivity : AppCompatActivity() {
     private var mediaPlayer: MediaPlayer? = null
     private var lastClickedPosition: Int? = null
+    private var isPlaying: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -82,54 +80,77 @@ class MainActivity : AppCompatActivity() {
         //Click item
         binding.gvSounds1.onItemClickListener =
             AdapterView.OnItemClickListener { adapterView, view, i, l ->
-                // Stop the currently playing sound
                 if (lastClickedPosition == i) {
-                    // Toggle between playing and stopping the sound
                     mediaPlayer?.let {
                         if (it.isPlaying) {
                             it.pause()
+                            isPlaying = false
+                            val fragment1 = Fragment1.newInstanceBtn(isPlaying)
+                            supportFragmentManager.beginTransaction().apply {
+                                replace(R.id.fl, fragment1)
+                                commitAllowingStateLoss()
+                            }
                         } else {
                             it.start()
+                            isPlaying = true
+                            val fragment1 = Fragment1.newInstanceBtn(isPlaying)
+                            supportFragmentManager.beginTransaction().apply {
+                                replace(R.id.fl, fragment1)
+                                commitAllowingStateLoss()
+                            }
                         }
                     }
                 } else {
-                    // Stop the currently playing sound
                     mediaPlayer?.let {
                         if (it.isPlaying) {
                             it.stop()
                             it.release()
+                            isPlaying = false
+                            val fragment1 = Fragment1.newInstanceBtn(isPlaying)
+                            supportFragmentManager.beginTransaction().apply {
+                                replace(R.id.fl, fragment1)
+                                commitAllowingStateLoss()
+                            }
                         }
                     }
 
-                    // Start playing the new sound
                     try {
                         mediaPlayer = MediaPlayer.create(this, list[i].linkSound)
                         mediaPlayer?.start()
+                        isPlaying = true
 
-                        //
                         val duration = mediaPlayer?.duration.toString()
                         val fragment = Fragment1.newInstance(duration)
                         supportFragmentManager.beginTransaction().apply {
                             replace(R.id.fl, fragment)
                             commitAllowingStateLoss()
                         }
-                        // Release the MediaPlayer when it's completed
-                        mediaPlayer?.setOnCompletionListener {
-                            it.release()
+                        val fragment1 = Fragment1.newInstanceBtn(isPlaying)
+                        supportFragmentManager.beginTransaction().apply {
+                            replace(R.id.fl, fragment1)
+                            commitAllowingStateLoss()
                         }
 
-                        // BGScreen change click item
-                        binding.root.setBackgroundResource(list[i].bg)
+                        mediaPlayer?.setOnCompletionListener {
+                            it.release()
+                            isPlaying = false
+                            val fragment1 = Fragment1.newInstanceBtn(isPlaying)
+                            supportFragmentManager.beginTransaction().apply {
+                                replace(R.id.fl, fragment1)
+                                commitAllowingStateLoss()
+                            }
+                        }
 
-                        // Update the last clicked position
+                        binding.root.setBackgroundResource(list[i].bg)
                         lastClickedPosition = i
                     } catch (e: Exception) {
                         e.printStackTrace()
-                        // Handle the exception (show a toast or log the error)
                         Toast.makeText(this, "Error playing the sound", Toast.LENGTH_SHORT).show()
                     }
                 }
             }
+
+
     }
 
     override fun onDestroy() {
@@ -137,6 +158,7 @@ class MainActivity : AppCompatActivity() {
         mediaPlayer?.release()
         super.onDestroy()
     }
+
 
 
 }
