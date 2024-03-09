@@ -46,7 +46,7 @@
             android:orientation="vertical">
 
             <ImageButton
-                android:id="@+id/btnTimer"
+                android:id="@+id/btnSetTime"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:background="@color/white"

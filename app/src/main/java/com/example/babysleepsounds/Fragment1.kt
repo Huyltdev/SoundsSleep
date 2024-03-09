@@ -72,14 +72,14 @@ class Fragment1 : Fragment() {
 
         // Thiết lập sự kiện nghe cho btnMute để xử lý khi nút được nhấn
         btnMute.setOnClickListener {
-            onMuteButtonClicked(it)
+            onPlayButtonViewClicked(it)
         }
 
         // Trả về view đã được tạo để hiển thị trên giao diện người dùng
         return view
     }
 
-    private fun onMuteButtonClicked(view: View) {
+    private fun onPlayButtonViewClicked(view: View) {
         // Lấy trạng thái âm lượng hiện tại
         val maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
         val currentVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
@@ -91,14 +91,14 @@ class Fragment1 : Fragment() {
         audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, newVolume, 0)
 
         // Cập nhật trạng thái của SeekBar nếu cần
-        volumeSeekBar.progress = newVolume
+        volumeSeekBar?.progress = newVolume
     }
 
     private fun setupVolumeControl() {
         val maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
         val currentVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
-        volumeSeekBar.max = maxVolume
-        volumeSeekBar.progress = currentVolume
+        volumeSeekBar?.max = maxVolume
+        volumeSeekBar?.progress = currentVolume
 
         volumeSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {

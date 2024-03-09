@@ -23,7 +23,7 @@ class MainActivity : AppCompatActivity(), Fragment1.OnPlayButtonClickListener {
         super.onCreate(savedInstanceState)
 
         // Hiển thị Splash Screen trong 3 giây
-        Thread.sleep(3000)
+//        Thread.sleep(3000)
         installSplashScreen()
 
         // Binding: Kết nối giao diện với mã nguồn
