@@ -1,5 +1,6 @@
 package com.example.babysleepsounds
 
+import android.app.TimePickerDialog
 import android.content.Context
 import android.media.AudioManager
 import android.os.Bundle
@@ -14,14 +15,15 @@ import androidx.fragment.app.Fragment
 
 class Fragment1 : Fragment() {
 
-    private lateinit var myTextView: TextView
+    private lateinit var txtTime: TextView
     private lateinit var playButton: ImageButton
     private var isPlaying: Boolean = false
     private lateinit var currentTimeView: TextView
     private lateinit var volumeSeekBar: SeekBar
     private lateinit var audioManager: AudioManager
     private lateinit var btnMute: ImageButton
-    // Đối tượng companion object, giúp tạo ra Fragment1 với đối số duration
+    private lateinit var btnSetTime: ImageButton
+
     companion object {
         private const val ARG_DURATION = "duration"
 
@@ -34,63 +36,60 @@ class Fragment1 : Fragment() {
         }
     }
 
-    // Ghi đè hàm onCreateView để khởi tạo giao diện người dùng
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        // Tạo ra view bằng cách inflate layout từ file XML (R.layout.fragment_1)
         val view: View = inflater.inflate(R.layout.fragment_1, container, false)
 
-        // Liên kết biến với các phần tử trong layout
-        myTextView = view.findViewById(R.id.txtTimer)
+        txtTime = view.findViewById(R.id.txtTime)
         playButton = view.findViewById(R.id.btnPlay)
         currentTimeView = view.findViewById(R.id.txtCurrentTime)
         volumeSeekBar = view.findViewById(R.id.volumeSeekBar)
         btnMute = view.findViewById(R.id.btnMute)
+        btnSetTime = view.findViewById(R.id.btnSetTime)
 
-        // Lấy đối số duration từ Bundle và cập nhật TextView
         arguments?.getString(ARG_DURATION)?.let {
             updateDuration(it)
         }
 
-        // Khởi tạo trạng thái isPlaying là true và cập nhật hình ảnh của nút playButton
-        isPlaying = true // Khởi tạo với trạng thái đúng
+        isPlaying = true
         updatePlayButtonImage()
 
-        // Thiết lập sự kiện nghe cho nút playButton để xử lý khi nút được nhấn
         playButton.setOnClickListener {
             onPlayButtonClicked(it)
         }
 
-        // Thiết lập AudioManager và Volume Control
         activity?.let {
             audioManager = it.getSystemService(Context.AUDIO_SERVICE) as AudioManager
             setupVolumeControl()
         }
 
-        // Thiết lập sự kiện nghe cho btnMute để xử lý khi nút được nhấn
         btnMute.setOnClickListener {
             onPlayButtonViewClicked(it)
         }
 
-        // Trả về view đã được tạo để hiển thị trên giao diện người dùng
+        btnSetTime.setOnClickListener {
+            onbtnSetTimeViewClicked(it)
+        }
+
         return view
     }
 
+    private fun onbtnSetTimeViewClicked(view: View) {
+        TimePickerDialog(
+            context, TimePickerDialog.OnTimeSetListener { view, hourOfDay, minute ->
+//                updateDuration(String.format("%02d:%02d", hourOfDay, minute))
+            },0,0,true
+        ).show()
+    }
+
     private fun onPlayButtonViewClicked(view: View) {
-        // Lấy trạng thái âm lượng hiện tại
         val maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
         val currentVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
-
-        // Nếu âm lượng hiện tại là 0, thì chuyển về âm lượng tối đa; ngược lại, chuyển về 0
         val newVolume = if (currentVolume == 0) maxVolume else 0
-
-        // Cập nhật âm lượng
         audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, newVolume, 0)
-
-        // Cập nhật trạng thái của SeekBar nếu cần
         volumeSeekBar?.progress = newVolume
     }
 
@@ -105,13 +104,9 @@ class Fragment1 : Fragment() {
                 audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, progress, 0)
             }
 
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {
-                // Có thể thêm code xử lý khi bắt đầu kéo SeekBar nếu cần
-            }
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
 
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {
-                // Có thể thêm code xử lý khi dừng kéo SeekBar nếu cần
-            }
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
     }
 
@@ -119,53 +114,38 @@ class Fragment1 : Fragment() {
         currentTimeView.text = time
     }
 
-
-    // Hàm này cập nhật TextView với giá trị duration mới
     fun updateDuration(duration: String) {
-        myTextView.text = duration
+        txtTime.text = duration
     }
 
-    // Hàm này cập nhật trạng thái isPlaying và hình ảnh của nút playButton
     fun updateIsPlaying(isPlaying: Boolean) {
         this.isPlaying = isPlaying
         updatePlayButtonImage()
     }
 
-    // Hàm xử lý khi nút playButton được nhấn
     fun onPlayButtonClicked(view: View) {
-        // Đảo ngược trạng thái isPlaying và cập nhật hình ảnh của nút playButton
         isPlaying = !isPlaying
         updatePlayButtonImage()
-
-        // Gọi sự kiện của interface để thông báo trạng thái mới
         (activity as? OnPlayButtonClickListener)?.onPlayButtonClicked(isPlaying)
-
-        // Bắt các ngoại lệ có thể xảy ra trong quá trình gọi sự kiện
         try {
             (requireActivity() as OnPlayButtonClickListener).onPlayButtonClicked(isPlaying)
         } catch (e: Exception) {
-            // Ghi log hoặc xử lý ngoại lệ phù hợp với ứng dụng của bạn
-            Log.e("Fragment11", "Lỗi trong onPlayButtonClicked", e)
+            Log.e("Fragment1", "Error in onPlayButtonClicked", e)
         }
     }
 
-    // Hàm này cập nhật hình ảnh của nút playButton dựa trên trạng thái isPlaying
     private fun updatePlayButtonImage() {
-        // Kiểm tra xem playButton đã được khởi tạo chưa
         if (::playButton.isInitialized) {
-            // Nếu đã khởi tạo, cập nhật hình ảnh dựa trên trạng thái isPlaying
             if (isPlaying) {
                 playButton.setImageResource(R.drawable.iconstop)
             } else {
                 playButton.setImageResource(R.drawable.iconplay)
             }
         } else {
-            // Nếu chưa khởi tạo, ghi log lỗi
-            Log.e("Fragment22", "playButton is null in updatePlayButtonImage()")
+            Log.e("Fragment1", "playButton is null in updatePlayButtonImage()")
         }
     }
 
-    // Interface để gửi sự kiện khi nút playButton được nhấn
     interface OnPlayButtonClickListener {
         fun onPlayButtonClicked(isPlaying: Boolean)
     }
