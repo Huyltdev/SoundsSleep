@@ -126,16 +126,25 @@ class Fragment1 : Fragment() {
     fun onPlayButtonClicked(view: View) {
         isPlaying = !isPlaying
         updatePlayButtonImage()
-        (activity as? OnPlayButtonClickListener)?.onPlayButtonClicked(isPlaying)
+
         try {
-            (requireActivity() as OnPlayButtonClickListener).onPlayButtonClicked(isPlaying)
-        } catch (e: Exception) {
-            Log.e("Fragment1", "Error in onPlayButtonClicked", e)
+            val activity = requireActivity()
+
+            if (activity is OnPlayButtonClickListener) {
+                activity.onPlayButtonClicked(isPlaying)
+            } else {
+                Log.e("Fragment1", "Activity must implement OnPlayButtonClickListener")
+            }
+        } catch (e: IllegalStateException) {
+            // Xử lý ngoại lệ nếu fragment không được gắn vào activity nào đó
+            Log.e("Fragment1", "Fragment is not attached to an activity", e)
         }
     }
 
+
     private fun updatePlayButtonImage() {
         if (::playButton.isInitialized) {
+            // Cập nhật hình ảnh của nút play dựa trên trạng thái isPlaying
             if (isPlaying) {
                 playButton.setImageResource(R.drawable.iconstop)
             } else {

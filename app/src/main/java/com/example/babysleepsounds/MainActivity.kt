@@ -23,7 +23,7 @@ class MainActivity : AppCompatActivity(), Fragment1.OnPlayButtonClickListener {
         super.onCreate(savedInstanceState)
 
         // Hiển thị Splash Screen trong 3 giây
-//        Thread.sleep(3000)
+        //Thread.sleep(3000)
         installSplashScreen()
 
         // Binding: Kết nối giao diện với mã nguồn
@@ -42,15 +42,7 @@ class MainActivity : AppCompatActivity(), Fragment1.OnPlayButtonClickListener {
         list.add(OutData(R.drawable.flash, "Flash", R.raw.flash, R.drawable.bgrain, false))
         list.add(OutData(R.drawable.wave, "Wawe", R.raw.wave, R.drawable.bgwave, false))
         list.add(OutData(R.drawable.wind, "Wind", R.raw.wind, R.drawable.bgwave, false))
-        list.add(
-            OutData(
-                R.drawable.heavyrain,
-                "Heavy Rain",
-                R.raw.heavyrain,
-                R.drawable.bgrain,
-                false
-            )
-        )
+        list.add(OutData(R.drawable.heavyrain, "Heavy Rain", R.raw.heavyrain, R.drawable.bgrain,false))
         list.add(
             OutData(
                 R.drawable.waterdrop,
@@ -98,7 +90,7 @@ class MainActivity : AppCompatActivity(), Fragment1.OnPlayButtonClickListener {
 
                 // Lấy thời lượng âm thanh và định dạng thành chuỗi hh:mm
                 val durationMs = it.duration
-                val durationFormatted = formatDuration(durationMs)
+                val durationFormatted = formatcurrentTime(durationMs)
 
                 // Thêm hoặc cập nhật Fragment hiển thị thời lượng
                 if (!durationFragmentAdded) {
@@ -136,17 +128,26 @@ class MainActivity : AppCompatActivity(), Fragment1.OnPlayButtonClickListener {
 
     private fun updateCurrentTimeEverySecond() {
         runnable = Runnable {
-            mediaPlayer?.let {
-                if (it.isPlaying) {
-                    val currentTime = it.currentPosition
-                    val currentTimeFormatted = formatcurrentTime(currentTime)
-                    currentDurationFragment?.updateCurrentTime(currentTimeFormatted)
+            try {
+                mediaPlayer?.let {
+                    if (it.isPlaying) {
+                        val currentTime = it.currentPosition
+                        val currentTimeFormatted = formatcurrentTime(currentTime)
+                        currentDurationFragment?.updateCurrentTime(currentTimeFormatted)
+                    }
+                    // Check if the MediaPlayer is not null and is not released
+                    if (mediaPlayer != null) {
+                        handler.postDelayed(runnable, 1000)
+                    }
                 }
-                handler.postDelayed(runnable, 1000)
+            } catch (e: IllegalStateException) {
+                // Handle the IllegalStateException, e.g., log the error or take appropriate action
+                e.printStackTrace()
             }
         }
         handler.postDelayed(runnable, 1000)
     }
+
 
 
     private fun formatcurrentTime(durationMs: Int): String {
@@ -156,25 +157,30 @@ class MainActivity : AppCompatActivity(), Fragment1.OnPlayButtonClickListener {
         val seconds = (durationMs / 1000) % 60
         return String.format("%02d:%02d:%02d", hours, minutes, seconds)
     }
-    private fun formatDuration(durationMs: Int): String {
-        // Định dạng thời lượng thành chuỗi hh:mm
-        val hours = (durationMs / (1000 * 60 * 60)) % 24
-        val minutes = (durationMs / (1000 * 60)) % 60
-        return String.format("%02d:%02d", hours, minutes)
-    }
 
     // Gọi khi nút Play trên Fragment1 được nhấn
     override fun onPlayButtonClicked(isPlaying: Boolean) {
-        this.isPlaying = isPlaying
-        // Tạm dừng hoặc tiếp tục âm thanh khi nút Play được nhấn
-        if (isPlaying) {
-            mediaPlayer?.pause()
-        } else {
-            mediaPlayer?.start()
+        // Check if MediaPlayer is not null
+        mediaPlayer?.let {
+            if (isPlaying) {
+                // Check if MediaPlayer is playing before pausing
+                if (it.isPlaying) {
+                    it.pause()
+                }
+            } else {
+                // Check if MediaPlayer is not playing before starting
+                if (!it.isPlaying) {
+                    it.start()
+                }
+            }
+            // Update the state in Fragment1
+            currentDurationFragment?.updateIsPlaying(!isPlaying)
+        } ?: run {
+            // Handle the case when mediaPlayer is null
+            Toast.makeText(this, "MediaPlayer is null", Toast.LENGTH_SHORT).show()
         }
-        // Cập nhật trạng thái isPlaying cho Fragment1
-        currentDurationFragment?.updateIsPlaying(!isPlaying)
     }
+
 
     override fun onDestroy() {
         // Giải phóng MediaPlayer khi Activity bị hủy
