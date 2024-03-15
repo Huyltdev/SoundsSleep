@@ -108,7 +108,7 @@ class MainActivity : AppCompatActivity(), Fragment1.OnPlayButtonClickListener {
 
                 // Thiết lập sự kiện khi âm thanh phát hết
                 it.setOnCompletionListener { mediaPlayer ->
-                    mediaPlayer.release()
+                    mediaPlayer?.release()
                     isPlaying = false
                     currentDurationFragment?.updateIsPlaying(isPlaying)
                 }
@@ -161,24 +161,17 @@ class MainActivity : AppCompatActivity(), Fragment1.OnPlayButtonClickListener {
     // Gọi khi nút Play trên Fragment1 được nhấn
     override fun onPlayButtonClicked(isPlaying: Boolean) {
         // Check if MediaPlayer is not null
-        mediaPlayer?.let {
-            if (isPlaying) {
-                // Check if MediaPlayer is playing before pausing
-                if (it.isPlaying) {
-                    it.pause()
-                }
-            } else {
-                // Check if MediaPlayer is not playing before starting
-                if (!it.isPlaying) {
-                    it.start()
-                }
-            }
-            // Update the state in Fragment1
-            currentDurationFragment?.updateIsPlaying(!isPlaying)
-        } ?: run {
-            // Handle the case when mediaPlayer is null
-            Toast.makeText(this, "MediaPlayer is null", Toast.LENGTH_SHORT).show()
+        this.isPlaying = isPlaying
+        if (this.isPlaying) {
+            // Nếu đang phát, dừng phát
+            mediaPlayer?.pause()
+        } else {
+            // Nếu đang dừng, tiếp tục phát
+            mediaPlayer?.start()
         }
+
+        // Cập nhật trạng thái isPlaying cho Fragment1
+        currentDurationFragment?.updateIsPlaying(this.isPlaying)
     }
 
 

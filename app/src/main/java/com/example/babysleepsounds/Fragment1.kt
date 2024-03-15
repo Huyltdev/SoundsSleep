@@ -11,12 +11,13 @@ import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.SeekBar
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 
 class Fragment1 : Fragment() {
 
     private lateinit var txtTime: TextView
-    private lateinit var playButton: ImageButton
+    lateinit var btnPlay: ImageButton
     private var isPlaying: Boolean = false
     private lateinit var currentTimeView: TextView
     private lateinit var volumeSeekBar: SeekBar
@@ -44,7 +45,7 @@ class Fragment1 : Fragment() {
         val view: View = inflater.inflate(R.layout.fragment_1, container, false)
 
         txtTime = view.findViewById(R.id.txtTime)
-        playButton = view.findViewById(R.id.btnPlay)
+        btnPlay = view.findViewById(R.id.btnPlay)
         currentTimeView = view.findViewById(R.id.txtCurrentTime)
         volumeSeekBar = view.findViewById(R.id.volumeSeekBar)
         btnMute = view.findViewById(R.id.btnMute)
@@ -55,9 +56,8 @@ class Fragment1 : Fragment() {
         }
 
         isPlaying = true
-        updatePlayButtonImage()
 
-        playButton.setOnClickListener {
+        btnPlay.setOnClickListener {
             onPlayButtonClicked(it)
         }
 
@@ -136,19 +136,18 @@ class Fragment1 : Fragment() {
                 Log.e("Fragment1", "Activity must implement OnPlayButtonClickListener")
             }
         } catch (e: IllegalStateException) {
-            // Xử lý ngoại lệ nếu fragment không được gắn vào activity nào đó
             Log.e("Fragment1", "Fragment is not attached to an activity", e)
         }
     }
 
 
     private fun updatePlayButtonImage() {
-        if (::playButton.isInitialized) {
+        if (::btnPlay.isInitialized) {
             // Cập nhật hình ảnh của nút play dựa trên trạng thái isPlaying
             if (isPlaying) {
-                playButton.setImageResource(R.drawable.iconstop)
+                btnPlay.setImageResource(R.drawable.iconplay)
             } else {
-                playButton.setImageResource(R.drawable.iconplay)
+                btnPlay.setImageResource(R.drawable.iconstop)
             }
         } else {
             Log.e("Fragment1", "playButton is null in updatePlayButtonImage()")
